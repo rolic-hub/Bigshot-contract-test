@@ -13,13 +13,29 @@ const accountToimpersonate = "0xc58Bb74606b73c5043B75d7Aa25ebe1D5D4E7c72"
 
 async function main() {
     await deployments.fixture(["all"])
-
+    const approveAmount = ethers.utils.parseEther("20")
+    const unit = ethers.utils.parseEther("18")
     const chain = network.config.chainId
     const signer = await ethers.getSigner(accountToimpersonate)
     const Aavecontract = await ethers.getContract(
         "AaveIntegrationHelper",
         signer
     )
+
+    await approveErc20(
+        Aavecontract.address,
+        networkConfig[chain]["wethToken"],
+        approveAmount,
+        signer
+    )
+
+    await Aavecontract.depositToken(
+        networkConfig[chain]["wethToken"],
+        unit,
+        approveAmount
+    )
+    console.log(`sucessfully deposited ${unit} into aave `)
+    await getBalance(networkConfig[chain]["wethToken"], signer)
 }
 
 async function unitTest(address, signerI, chain) {

@@ -43,8 +43,8 @@ contract AaveIntegrationHelper {
         address user
     ) public {
         uint256 totalCollateral = flashCollateral + userCollateral;
-        IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);
-        IERC20(tokenAddress).approve(address(poolAddress), amount);
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), totalCollateral);
+        IERC20(tokenAddress).approve(address(poolAddress), totalCollateral);
 
         poolAddress.supply(tokenAddress, totalCollateral, user, 0);
         poolAddress.setUserUseReserveAsCollateral(tokenAddress, true);
@@ -67,7 +67,7 @@ contract AaveIntegrationHelper {
         uint256 targetHealth
     ) public {
         
-        IERC20(tokenAddress).approve(address(poolAddress), amount);
+        IERC20(tokenAddress).approve(address(poolAddress), units);
         poolAddress.repay(collateralAddress, units, 2, user);
         (
             uint256 totalCollateralBase,
