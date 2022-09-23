@@ -13,41 +13,49 @@ const accountToimpersonate = "0xc58Bb74606b73c5043B75d7Aa25ebe1D5D4E7c72"
 
 async function main() {
     await deployments.fixture(["all"])
-    
+
     const chain = network.config.chainId
     const signer = await ethers.getSigner(accountToimpersonate)
-    const Aavecontract = await ethers.getContract("AaveIntegrationHelper", signer)
+    const Aavecontract = await ethers.getContract(
+        "AaveIntegrationHelper",
+        signer
+    )
+}
+
+async function unitTest(address, signerI, chain) {
     const approveAmount = ethers.utils.parseEther("20")
     console.log("done")
-    
 
     await approveErc20(
-        Aavecontract.address,
+        address,
         networkConfig[chain]["wethToken"],
         approveAmount,
-        signer
+        signerI
     )
 
     await Aavecontract.callTransferFrom(
         networkConfig[chain]["wethToken"],
-        approveAmount,
+        approveAmount
     )
-    
+
+    await getBalance(networkConfig[chain]["wethToken"], signerI)
+
     console.log("transferred token")
     await Aavecontract.callApprove(
         networkConfig[chain]["wethToken"],
         ethers.utils.parseEther("18")
     )
     console.log("approved contract")
-    // await Aavecontract.depositToken(
-    //     linkToken,
-    //     ethers.utils.parseEther("5"),
-    //     ethers.utils.parseEther("6")
-    // )
 }
 
-async function getBalance() {
-    
+async function getBalance(erc20TokenAddress, signer) {
+    const erc20Token = await ethers.getContractAt(
+        "IERC20",
+        erc20TokenAddress,
+        signer
+    )
+    const balance = await erc20Token.balanceOf(accountToimpersonate)
+    console.log(`amount of weth is ${balance.toString()}`)
 }
 
 async function approveErc20(spenderAddress, erc20TokenAddress, amount, signer) {
