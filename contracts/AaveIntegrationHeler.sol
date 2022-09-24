@@ -73,7 +73,7 @@ contract AaveIntegrationHelper {
         uint256 targetHealth
     ) public {
         IERC20(tokenBorrowed).approve(address(poolAddress), units);
-        poolAddress.repay(tokenBorrowed, units, 2, user);
+        poolAddress.repay(tokenBorrowed, type(uint256).max, 2, user);
         (
             uint256 totalCollateralBase,
             uint256 totalDebtBase,
@@ -86,7 +86,7 @@ contract AaveIntegrationHelper {
             uint256 _getPrice = oracleAddress.getAssetPrice(collateralAddress);
             uint256 amountWithdraw = (totalCollateralBase / _getPrice) *
                 1000000000000000000;
-            poolAddress.withdraw(collateralAddress, totalCollateralBase, user);
+            poolAddress.withdraw(collateralAddress, amountWithdraw, user);
         } else {
             uint256 withdrawAmount = calculateWithdraw(
                 targetHealth,
@@ -143,7 +143,7 @@ contract AaveIntegrationHelper {
         uint256 totalBorrow,
         uint256 liquidationThreshold,
         address collateralAddress
-    ) public pure returns (uint256) {
+    ) public view returns (uint256) {
         uint256 liquidationValue = liquidationThreshold / 100;
         uint256 totalCollateral = (healthFactor * totalBorrow) /
             liquidationValue;

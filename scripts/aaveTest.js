@@ -1,4 +1,4 @@
-const { ethers, deployments, getNamedAccounts, network } = require("hardhat")
+const { ethers, deployments, network } = require("hardhat")
 const abi = require("../constants/abi.json")
 const { networkConfig } = require("../helperHardhat")
 const aaveAbi = require("../artifacts/contracts/AaveIntegrationHeler.sol/AaveIntegrationHelper.json")
@@ -67,6 +67,30 @@ async function main() {
         `TotalCollateralBase - ${totalCollateralBase},\n totalDebtBase - ${totalDebtBase},
         \n availableBorrowsBase - ${availableBorrowsBase}, \n currentLiquidationThreshold - ${currentLiquidationThreshold}, \n
         ltv - ${ltv}, \n healthFactor - ${healthFactor}`
+    )
+    console.log("repaying loan")
+    
+    await Aavecontract._repayAndWithdrawCollateral(
+        link,
+        ethers.utils.parseEther("50"),
+        weth,
+        Aavecontract.address,
+        0
+    )
+
+    const {
+        totalCollateralBas,
+        totalDebtBas,
+        availableBorrowsBas,
+        currentLiquidationThreshol,
+        lt,
+        healthFacto,
+    } = await Aavecontract.getUserData(Aavecontract.address)
+
+    console.log(
+        `TotalCollateralBase - ${totalCollateralBas},\n totalDebtBase - ${totalDebtBas},
+        \n availableBorrowsBase - ${availableBorrowsBas}, \n currentLiquidationThreshold - ${currentLiquidationThreshol}, \n
+        ltv - ${lt}, \n healthFactor - ${healthFacto}`
     )
     // const oracle_price = await Aavecontract.getPrice(
     //     networkConfig[chain]["linkToken"]
