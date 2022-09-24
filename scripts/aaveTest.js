@@ -16,6 +16,7 @@ async function main() {
     const signer = await ethers.getSigner(accountToimpersonate)
     const dai = networkConfig[chain]["daiToken"]
     const weth = networkConfig[chain]["wethToken"]
+    const link = networkConfig[chain]["linkToken"]
     const Aavecontract = await ethers.getContract(
         "AaveIntegrationHelper",
         signer
@@ -38,9 +39,9 @@ async function main() {
         \nltv - ${ltvF}, \n healthFactor - ${healthFactorF}`
     )
     await Aavecontract._suppllyCollateralAndBorrow(
+        link,
+        ethers.utils.parseEther("50"),
         weth,
-        ethers.utils.parseEther("1000"),
-        dai,
         ethers.utils.parseEther("15"),
         ethers.utils.parseEther("3")
     )
@@ -48,8 +49,8 @@ async function main() {
         `supplied ${ethers.utils.parseEther(
             "18"
         )} worth of weth as collateral and borrowed ${ethers.utils.parseEther(
-            "1000"
-        )} worth of dai `
+            "50"
+        )} worth of link`
     )
     //console.log(await supplyBorrow.wait(1))
     console.log("After depositing and borrowing")
@@ -67,6 +68,14 @@ async function main() {
         \n availableBorrowsBase - ${availableBorrowsBase}, \n currentLiquidationThreshold - ${currentLiquidationThreshold}, \n
         ltv - ${ltv}, \n healthFactor - ${healthFactor}`
     )
+    // const oracle_price = await Aavecontract.getPrice(
+    //     networkConfig[chain]["linkToken"]
+    // )
+    // console.log(`the price of link Token is ${oracle_price}`)
+    // const Woracle_price = await Aavecontract.getPrice(weth)
+    // console.log(`the price of weth Token is ${Woracle_price}`)
+    // const Doracle_price = await Aavecontract.getPrice(dai)
+    // console.log(`the price of dai Token is ${Doracle_price}`)
 }
 
 async function depositTest(chain, unitd, approveAmount, signerD) {
