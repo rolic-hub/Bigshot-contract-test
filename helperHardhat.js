@@ -1,9 +1,13 @@
+
+
 const networkConfig = {
     31337: {
         name: "localhost",
         LendingPool1: "0x794a61358d6845594f94dc1db02a252b5b4814ad",
         wethToken: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
         daiToken: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+        aaveOracle: "0xb023e699F5a33916Ea823A16485e259257cA8Bd1",
+        linkToken: "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39",
     },
 
     80001: {
