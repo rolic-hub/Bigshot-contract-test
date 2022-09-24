@@ -6,9 +6,6 @@ const {
     impersonateAccount,
 } = require("@nomicfoundation/hardhat-network-helpers")
 
-const linkToken = networkConfig[80001]["LendingPool"]
-const usdt = "0xBD21A10F619BE90d6066c941b04e340841F1F989"
-const deployedAddress = "0xD8579efdCE2032CEb125947235d871F7D1C1844C"
 const accountToimpersonate = "0xc58Bb74606b73c5043B75d7Aa25ebe1D5D4E7c72"
 
 async function main() {
@@ -17,25 +14,63 @@ async function main() {
     const unit = ethers.utils.parseEther("18")
     const chain = network.config.chainId
     const signer = await ethers.getSigner(accountToimpersonate)
+    const dai = networkConfig[chain]["daiToken"]
+    const weth = networkConfig[chain]["wethToken"]
     const Aavecontract = await ethers.getContract(
         "AaveIntegrationHelper",
         signer
     )
 
-    await approveErc20(
-        Aavecontract.address,
-        networkConfig[chain]["wethToken"],
-        approveAmount,
-        signer
-    )
+    await approveErc20(Aavecontract.address, weth, approveAmount, signer)
+    const {
+        totalCollateral,
+        totalDebt,
+        availableBorrow,
+        currentLiquidation,
+        ltvF,
+        healthFactorF,
+    } = await Aavecontract.getUserData(Aavecontract.address)
 
+    console.log(
+        `TotalCollateralBase - ${totalCollateral},\n totalDebtBase - ${totalDebt},
+        \n availableBorrowsBase - ${availableBorrow}, \n currentLiquidationThreshold - ${currentLiquidation},
+        \nltv - ${ltvF}, \n healthFactor - ${healthFactorF}`
+    )
+     await Aavecontract._suppllyCollateralAndBorrow(
+        weth,
+        ethers.utils.parseEther("10"),
+        dai,
+        ethers.utils.parseEther("15"),
+        ethers.utils.parseEther("3")
+    )
+    console.log(
+        `supplied collateral and borrowed ${ethers.utils.parseEther("10")} `
+    )
+    //console.log(await supplyBorrow.wait(1))
+    const {
+        totalCollateralBase,
+        totalDebtBase,
+        availableBorrowsBase,
+        currentLiquidationThreshold,
+        ltv,
+        healthFactor,
+    } = await Aavecontract.getUserData(Aavecontract.address)
+
+    console.log(
+        `TotalCollateralBase - ${totalCollateralBase},\n totalDebtBase - ${totalDebtBase},
+        \n availableBorrowsBase - ${availableBorrowsBase}, \n currentLiquidationThreshold - ${currentLiquidationThreshold}, \n
+        ltv - ${ltv}, \n healthFactor - ${healthFactor}`
+    )
+}
+
+async function depositTest(chain, unitd, approveAmount, signerD) {
     await Aavecontract.depositToken(
         networkConfig[chain]["wethToken"],
-        unit,
+        unitd,
         approveAmount
     )
-    console.log(`sucessfully deposited ${unit} into aave `)
-    await getBalance(networkConfig[chain]["wethToken"], signer)
+    console.log(`sucessfully deposited ${unitd} into aave `)
+    await getBalance(networkConfig[chain]["wethToken"], signerD)
 }
 
 async function unitTest(address, signerI, chain) {

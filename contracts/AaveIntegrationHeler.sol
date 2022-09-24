@@ -39,16 +39,19 @@ contract AaveIntegrationHelper {
         uint256 units,
         address collateralAddress,
         uint256 flashCollateral,
-        uint256 userCollateral,
-        address user
+        uint256 userCollateral
     ) public {
         uint256 totalCollateral = flashCollateral + userCollateral;
-        IERC20(tokenAddress).transferFrom(msg.sender, address(this), totalCollateral);
+        IERC20(tokenAddress).transferFrom(
+            msg.sender,
+            address(this),
+            totalCollateral
+        );
         IERC20(tokenAddress).approve(address(poolAddress), totalCollateral);
 
-        poolAddress.supply(tokenAddress, totalCollateral, user, 0);
+        poolAddress.supply(tokenAddress, totalCollateral, address(this), 0);
         poolAddress.setUserUseReserveAsCollateral(tokenAddress, true);
-        poolAddress.borrow(collateralAddress, units, 2, 0, user);
+        poolAddress.borrow(collateralAddress, units, 2, 0, address(this));
     }
 
     /*
@@ -66,7 +69,6 @@ contract AaveIntegrationHelper {
         address user,
         uint256 targetHealth
     ) public {
-        
         IERC20(tokenAddress).approve(address(poolAddress), units);
         poolAddress.repay(collateralAddress, units, 2, user);
         (
@@ -93,8 +95,35 @@ contract AaveIntegrationHelper {
         poolAddress.ADDRESSES_PROVIDER();
     }
 
-    function getUserData(address user) public view {
-        poolAddress.getUserAccountData(user);
+    function getUserData(address user)
+        public
+        view
+        returns (
+            uint256 totalCollateralBase,
+            uint256 totalDebtBase,
+            uint256 availableBorrowsBase,
+            uint256 currentLiquidationThreshold,
+            uint256 ltv,
+            uint256 healthFactor
+        )
+    {
+        (
+            uint256 totalCollateralBase,
+            uint256 totalDebtBase,
+            uint256 availableBorrowsBase,
+            uint256 currentLiquidationThreshold,
+            uint256 ltv,
+            uint256 healthFactor
+        ) = poolAddress.getUserAccountData(user);
+
+        return (
+              totalCollateralBase,
+             totalDebtBase,
+             availableBorrowsBase,
+             currentLiquidationThreshold,
+             ltv,
+             healthFactor
+        );
     }
 
     // calculate the total collateral to be withdrawn by using the health factor given
