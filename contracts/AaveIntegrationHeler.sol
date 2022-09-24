@@ -12,14 +12,6 @@ contract AaveIntegrationHelper {
         poolAddress = IPool(_poolAddress);
     }
 
-    function callTransferFrom(address tokenAddress, uint256 amount) public {
-        IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);
-    }
-
-    function callApprove(address tokenAddress, uint256 amount) public {
-        IERC20(tokenAddress).approve(address(poolAddress), amount);
-    }
-
     function depositToken(
         address tokenAddress,
         uint256 units,
@@ -108,21 +100,21 @@ contract AaveIntegrationHelper {
         )
     {
         (
-            uint256 totalCollateralBase,
-            uint256 totalDebtBase,
-            uint256 availableBorrowsBase,
-            uint256 currentLiquidationThreshold,
-            uint256 ltv,
-            uint256 healthFactor
+            uint256 totalCollateral,
+            uint256 totalDebt,
+            uint256 availableBorrows,
+            uint256 currentLiquidation,
+            uint256 ltvM,
+            uint256 healthFactorM
         ) = poolAddress.getUserAccountData(user);
 
         return (
-              totalCollateralBase,
-             totalDebtBase,
-             availableBorrowsBase,
-             currentLiquidationThreshold,
-             ltv,
-             healthFactor
+            totalCollateral,
+            totalDebt,
+            availableBorrows,
+            currentLiquidation,
+            ltvM,
+            healthFactorM
         );
     }
 
